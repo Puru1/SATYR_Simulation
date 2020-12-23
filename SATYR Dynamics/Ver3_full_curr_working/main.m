@@ -8,9 +8,9 @@ global enableSaturation;% Global feature settings
 global K; % Global controller params
 
 %% FILE FEATURE SETTINGS
-enableSaturation = "linear"; %{cutoff,linear,none}
+enableSaturation = "cutoff"; %{cutoff,linear,none}
 captureVideoEnable = true;
-simTime = 4;
+simTime = 4.0;
 
 %% LOCAL VARIBALES
 p = getParams();
@@ -24,18 +24,18 @@ angle_of_linearization = p.theta2_num; %Used in graphing
 %Qq = diag([1 1/R 1/w 1/(w*Rx)]);
 
 %Witout initial vel
-% Qq = diag([1000 1 10 10 1000 1 10 10]); %This worked (not work w 4 m/s ic)
-% Ru = diag([1 10 3]); 
+Qq = diag([1000 1 10 10 1000 1 10 10]); %This worked (not work w 4 m/s ic)
+Ru = diag([1 10 3]); 
 
 %With inital vel
-Qq = diag([10 1000 1000 1 150 10 10 10]); %This did not. dtheta3 cost < 100
-Ru = diag([2 10 10]); 
+% Qq = diag([10 1000 1000 1 150 10 10 10]); %This did not. dtheta3 cost < 100
+% Ru = diag([2 10 10]); 
 
 K = lqr(A,B,Qq,Ru);
 K(:,1) = 0;
 
 %% SIMULATION
-q0 = [0; 0; 0; 0; 0; 0; 0; 0];
+q0 = [0; pi/8; -pi/10; 0; 0; 0; 0; 0];
 [T,X] = ode45(@(t,X)SimpleSegway(t,X,p),[0 simTime],q0);
 
 % Output States
@@ -50,10 +50,20 @@ dtheta3 = X(:,8);
 
 %% TORQUE CALCULATION
 [tao,tao_desired] = calculateTorques(X,p);
-
+% 
 %% ANIMATION
 animatingRobot(T,X,p);
 %animate3DRobot(T,X);
+
+%% ANIMATING SINGLE FRAME
+% singleFrameFigure(p);
+theta = [0,pi/6,0];
+xW = 0;
+q = [xW, theta];
+L = [1, 1, 1];
+CoM = comCalc(q,L);
+% com = [test, l2Com, l3Com];
+SATYRR_Visualize(theta,L,CoM);
 
 %% GRAPHING 
 limx = simTime;

@@ -47,7 +47,7 @@ for k = 1:length(timeA)
     plot([-5 5],[-R -R],'k','LineWidth',2)
     fill(XW+R*sin(ang),R*cos(ang),[0 0 1])
     axis([-2.5 2.5 -.75 .75]);
-    daspect(ones(1,3));
+%     daspect(ones(1,1));
 
     grid on
     hold off

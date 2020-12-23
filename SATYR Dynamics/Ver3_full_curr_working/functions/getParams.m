@@ -7,13 +7,13 @@ p.g = 9.81;
 valM.mW = .42972;
 valM.cm1 = .66162;
 valM.cm2 = .9061;
-valM.mR = 15.513;
+valM.mR = 5.63;
 p.valM = valM;
 
 %Link lengths
-valL.L1 = .180;
-valL.L2 = .100;
-valL.L3 = .118;
+valL.L1 = .160;
+valL.L2 = .200;
+valL.L3 = .4;
 p.valL = valL;
 
 %Linearization angle
@@ -25,7 +25,7 @@ p.theta3_num = 0;
 %CAD values
 p.mK = .04; %currently not used
 p.mH = .4;  %currently not used
-p.R = 0.05; %radius of wheel
+p.R = 0.06; %radius of wheel
 
 
 %Inertial values (from CAD model)

@@ -7,7 +7,7 @@ p.g = 9.81;
 valM.mW = .42972;
 valM.cm1 = .66162;
 valM.cm2 = .9061;
-valM.mR = 15.513;
+valM.mR = 5.639;
 p.valM = valM;
 
 %Link lengths
