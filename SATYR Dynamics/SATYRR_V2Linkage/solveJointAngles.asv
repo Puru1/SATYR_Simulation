@@ -1,0 +1,39 @@
+function [theta1_out,theta2_out] = solveJointAngles(theta1_r,l_h,p);
+    
+    % Function passed values
+%     L = [.16, .2, -.01884, .07329];
+%     M = [.66162, .9061, 5.63];
+%     theta1 = deg2rad(10)
+    
+    % Method
+    %       1: Automatically solve for both angles using height parameter
+    %       2: Given theta1 we assume theta 2 = -1.5*theta1. No control on
+    %       height.
+
+    % Solver
+%     syms theta2 theta3 theta2_b
+    syms theta1 theta2 theta2_b
+    
+    L1 = p.valL.L1;
+    L2 = p.valL.L2;
+    L3 = p.valL.L3;
+    
+    zPend = vpa(l_h*cos(theta1_r));
+    xPend = vpa(l_h*sin(theta1_r));
+    
+%     E1 = L1*cos(theta1) + L2*cos(theta2) + L3 == zPend;
+%     E2 = L1*sin(theta1) + L2*sin(theta2) == xPend;
+%     
+%     sol = solve([E1,E2],[theta1,theta2])
+    theta1_t = subs(-2*atan(((L2^2*(2*L2*beta + ((- L1^2 + 2*L1*L2 - L2^2 + alpha^2 + beta^2)*(L1^2 + 2*L1*L2 + L2^2 - alpha^2 - beta^2))^(1/2)))/(- L1^2 + L2^2 + 2*L2*alpha + alpha^2 + beta^2) - 2*L2*beta - (L1^2*(2*L2*beta + ((- L1^2 + 2*L1*L2 - L2^2 + alpha^2 + beta^2)*(L1^2 + 2*L1*L2 + L2^2 - alpha^2 - beta^2))^(1/2)))/(- L1^2 + L2^2 + 2*L2*alpha + alpha^2 + beta^2) - 2*L1*beta + (alpha^2*(2*L2*beta + ((- L1^2 + 2*L1*L2 - L2^2 + alpha^2 + beta^2)*(L1^2 + 2*L1*L2 + L2^2 - alpha^2 - beta^2))^(1/2)))/(- L1^2 + L2^2 + 2*L2*alpha + alpha^2 + beta^2) + (beta^2*(2*L2*beta + ((- L1^2 + 2*L1*L2 - L2^2 + alpha^2 + beta^2)*(L1^2 + 2*L1*L2 + L2^2 - alpha^2 - beta^2))^(1/2)))/(- L1^2 + L2^2 + 2*L2*alpha + alpha^2 + beta^2) + (2*L2*alpha*(2*L2*beta + ((- L1^2 + 2*L1*L2 - L2^2 + alpha^2 + beta^2)*(L1^2 + 2*L1*L2 + L2^2 - alpha^2 - beta^2))^(1/2)))/(- L1^2 + L2^2 + 2*L2*alpha + alpha^2 + beta^2))/(L1^2 + 2*L1*alpha - L2^2 + alpha^2 + beta^2))
+
+
+    theta2_out = double(simplify(vpa(theta2_t(1))));
+    theta1_out = double(simplify(vpa(theta1_t(1))));
+    
+    theta2_deg = rad2deg(theta2_out)
+    theta1_deg = rad2deg(theta1_out)
+end
+
+
+
