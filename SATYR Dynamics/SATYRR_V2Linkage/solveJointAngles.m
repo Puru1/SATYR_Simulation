@@ -1,4 +1,4 @@
-function [theta1_out,theta2_out] = solveJointAngles(theta1_r,l_h,p);
+function [theta1_out,theta2_out] = solveJointAngles(method,l_h,p);
     
     % Function passed values
 %     L = [.16, .2, -.01884, .07329];
@@ -18,17 +18,18 @@ function [theta1_out,theta2_out] = solveJointAngles(theta1_r,l_h,p);
     L2 = p.valL.L2;
     L3 = p.valL.L3;
     
-    zPend = vpa(l_h*cos(theta1_r));
-    xPend = vpa(l_h*sin(theta1_r));
-    
     alpha = l_h - L3;
-    beta = 0;
-    z = (L1^2 - L2^2 - (alpha^2 + beta^2))/(-2*L2);
-    A = sqrt(alpha^2 + beta^2);
-    phi = asin(alpha/A);
-    theta2_out = asin(z/A) - phi;
-    theta1_out = acos((alpha- L2*cos(theta2_out))/L1);
-    
+    if(method == 1)
+        beta = 0;
+        z = (L1^2 - L2^2 - (alpha^2 + beta^2))/(-2*L2);
+        A = sqrt(alpha^2 + beta^2);
+        phi = asin(alpha/A);
+        theta2_out = asin(z/A) - phi;
+        theta1_out = acos((alpha- L2*cos(theta2_out))/L1);
+    elseif (method == 2)
+        theta2_out = 2*acos((alpha/(L1+L2)));
+        theta1_out = -theta2_out/2;
+    end 
 %     theta2_deg = rad2deg(theta2_out)
 %     theta1_deg = rad2deg(theta1_out)
 end

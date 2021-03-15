@@ -5,23 +5,19 @@ clear all;
 
 addpath functions;
 
-syms xW theta1 theta2 theta3 real %joint positions
+syms xW theta1 theta2 theta3 theta_imu real %joint positions
 syms dxW dtheta1 dtheta2 dtheta3 dL_h real%joint velocities
 syms ddxW ddtheta1 ddtheta2 ddtheta3 dL_h real%joint accelerations
 syms tau1 tau2 tau3 real%torques
 syms g mW mCM1 mK mCM2 mH mR IW IK IH IR L1 L2 L3 R H1 real% [gravity, wheel mass, knee mass, hip mass, robot mass, wheel inertia, knee inertia, hip inertia ..., wheel radius]
 syms I0x I0y I0z I1x I1y I1z I2x I2y I2z I3x I3y I3z real
 %Joint state vectors and manip. parameters
-q = [xW;theta1;theta2];
-dq = [dxW;dtheta1; dtheta2];
-ddq = [ddxW;ddtheta1; ddtheta2];
+q = [xW;theta2];
+dq = [dxW;dtheta2];
+ddq = [ddxW;ddtheta2];
 
-theta3 = theta2/2;
-dtheta3 = theta2/2;
-ddtheta3 = ddtheta2/2;
-
-qVec = [xW theta1 theta2];
-dqVec = [dxW dtheta1 dtheta2];
+qVec = [xW theta2];
+dqVec = [dxW dtheta2];
 tauVec = [tau1 tau2];
 
 L_CM1 = .2169*L1;
@@ -42,9 +38,9 @@ uy = [0; 1; 0]; %Wheel, knee and hip rotation around y axis
 %Joint 0 (wheel), %Joint 1 (knee), %Joint 2 (Hip), %Joint 3 (Robot)
 
 %Base(B) -> Wheel(0)
-RB0 = [[cos(theta1) 0 sin(theta1)]; 
+RB0 = [[cos(theta_imu - theta2/2) 0 sin(theta_imu - theta2/2)]; 
        [0 1 0];
-       [-sin(theta1) 0 cos(theta1)]];
+       [-sin(theta_imu  - theta2/2) 0 cos(theta_imu - theta2/2)]];
 vB0 = [xW;0;0];
 HTMB0 = [[RB0, vB0]
          [0 0 0 1]];
@@ -74,9 +70,9 @@ HTM1cm2 = [[R1cm2 v1cm2]
 HTMBcm2 = HTMB1*HTM1cm2;
      
 %Knee(1) -> Hip(2)   
-R12 = [[cos(theta2/2) 0 sin(theta2/2)];
+R12 = [[cos(-theta2/2) 0 sin(-theta2/2)];
        [0 1 0];
-       [-sin(theta2/2) 0 cos(theta2/2)];];
+       [-sin(-theta2/2) 0 cos(-theta2/2)];];
 RB2 = RB1*R12;
 v12 = [0; 0; L2];%Translation from frame knee to frame hip (written in frame knee)
 HTM12 = [[R12 v12] 
@@ -164,8 +160,8 @@ JwR = jacobian(wR,dq); %Robot
 Jw = {Jw0 Jwcm1 Jwcm2 JwR}; %{Jw_wheel, Jw_knee, Jw_hip, Jw_robot}
 
 %Manipulator inertia matrix.
-M = zeros(3);
-for i = 1:4
+M = zeros(2);
+for i = 1:2
     M = M + (vMass(i)*Jv{i}'*Jv{i} + Jw{i}'*Rot{i}*I{i}*Rot{i}'*Jw{i});
 end
 
@@ -182,12 +178,12 @@ dAcmm(3,:) = simplify(jacobian(Acmm(3,:),q) * dq)';
 
 m_list = import_m_list();
 
-write_fcn_m('fullM_fnc_PosCM1.m',{'q','L'},[m_list.q;m_list.L],{PosCM1,'PosCM1'});
-write_fcn_m('fullM_fnc_PosK.m',{'q','L'},[m_list.q;m_list.L],{PosK,'PosK'});
-write_fcn_m('fullM_fnc_PosCM2.m',{'q','L'},[m_list.q;m_list.L],{PosCM2,'PosCM2'});
-write_fcn_m('fullM_fnc_PosH.m',{'q','L'},[m_list.q;m_list.L],{PosH,'PosH'});
-write_fcn_m('fullM_fnc_PosCoM_R.m',{'q','L'},[m_list.q;m_list.L],{PosR,'PosR'});
-write_fcn_m('fullM_fnc_PosT.m',{'q','L'},[m_list.q;m_list.L],{PosT,'PosT'});
+write_fcn_m('fnc_PosCM1.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosCM1,'PosCM1'});
+write_fcn_m('fnc_PosK.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosK,'PosK'});
+write_fcn_m('fnc_PosCM2.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosCM2,'PosCM2'});
+write_fcn_m('fnc_PosH.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosH,'PosH'});
+write_fcn_m('fnc_PosCoM_R.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosR,'PosR'});
+write_fcn_m('fnc_PosT.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosT,'PosT'});
 %% KINETIC AND POTENTIAL ENERGY
 K = (1/2)*dq'*M*dq;
 
@@ -228,18 +224,20 @@ f = H_inv *(u-C); % The simplify() command and the \ seem to be the problem
 
 % Calculate and show linearization 
 p = getParams();
-L = [p.valL.L1,p.valL.L2,p.valL.L3];
+L = p.L;
 M = [p.valM.cm1,p.valM.cm2,p.valM.mB];
 xW = 0;
 
-p.theta1_num = 0;
-p.theta2_num = 0;
-p.theta3_num = p.theta2_num/2;
-
-q_vis = [xW, p.theta1_num,p.theta2_num,p.theta3_num];
+% p.theta1_num = 0;
+% p.theta2_num = 0;
+% p.theta3_num = p.theta2_num/2;
+theta_imu = 0;
+[theta1_f, theta2_f] = solveJointAngles(2,.65,p);
+q_vis = [xW, theta2_f,theta_imu];
 fSingle = figure(99);
 ax=axes('Parent',fSingle);
 SATYRR_Visualize(q_vis,L,ax);
+%%
 g_acc = [0;0;-g];
 p.theta1_num + p.theta2_num + p.theta3_num
 

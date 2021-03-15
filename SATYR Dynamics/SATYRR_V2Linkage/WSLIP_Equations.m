@@ -126,7 +126,7 @@ xW = 0;
 
 L_total = sum(L);
 M_total = sum(M);
-l_h_lin = L_total - (M_total*p.g)/p.Ks; 
+l_h_lin = L_total - (M_total*9.81)/p.Ks;
 
             %  xW  |  l_h   |  theta1    |   dxW   |   dl_h  |  dtheta1  | 
 states_lin = [  0    l_h_lin       0          0         0        0     ];

@@ -8,7 +8,7 @@ p = getParams();
 %% FILE FEATURE SETTINGS
 p.enableSaturation = "cutoff"; %{cutoff,linear,none}
 p.captureVideoEnable = false;
-simTime = 3.0;
+simTime = 5.0;
 
 %% LOCAL VARIBALES
 
@@ -25,8 +25,8 @@ B = [zeros(3,2); B];
 
 %Witout initial vel
 % Qq = diag([1000 1 10 10 1000 1 10 10]); %This worked (not work w 4 m/s ic)
-Qpos = diag([5 1 20]);
-Qvel = diag([200 10 100]);
+Qpos = diag([5 50 100]);
+Qvel = diag([200 10 50]);
 Qq = blkdiag(Qpos, Qvel);
 Ru = diag([1 5]); 
 % Ru = diag([100 2 10]); 
@@ -40,9 +40,7 @@ K = lqr(A,B,Qq,Ru);
 write_fcn_m('fnc_K.m',{},[],{K,'K'});
 vpa(eig((A-B*K)))
 %% SIMULATION
-theta_initial = pi/18;
-
-q0 = [0; .76; 0; 0; 0; 0];
+q0 = [0; .60; pi/18; 0; 0; 0];
 [T,X] = ode45(@(t,X)SimpleSegway(t,X,p),[0 simTime],q0);
 
 % Output States
@@ -69,7 +67,7 @@ animatingWSLIP(T,X,p);
 %% ANIMATING SINGLE FRAME
 THETA1_R = pi/18;
 xW = 0;
-LH = .65;
+LH = .76;
 L = p.L;
 [theta1_f, theta2_f] = solveJointAngles(THETA1_R,LH,p);
 q_vis = [xW, THETA1_R + vpa(theta1_f), vpa(-theta1_f+theta2_f),-vpa(theta2_f)];
