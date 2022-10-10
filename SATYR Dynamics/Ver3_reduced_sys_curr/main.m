@@ -11,7 +11,7 @@ global K; % Global controller params
 %% FILE FEATURE SETTINGS
 enableSaturation = "linear"; %{cutoff,linear,none}
 captureVideoEnable = true;
-simTime = .14;
+simTime = 2;
 
 %% LOCAL VARIBALES
 p = getParams();
@@ -39,7 +39,7 @@ K = lqr(A,B,Qq,Ru);
 K(:,1) = 0;
 
 %% SIMULATION
-q0 = [0; 0; pi/10; 0; 0; 0; 0; 0];
+q0 = [-pi/10; 0; pi/10; 0; 0; 0; 0; 0];
 options = odeset('Events',@(t,X)robot_stopped(t,X,p));
 
 [T,X] = ode45(@(t,X)SimpleSegway(t,X,p,Ru),[0 simTime],q0);
@@ -56,7 +56,7 @@ dtheta3 = X(:,8);
 
 
 %% POST-PROCESSING
-[DDQ_LOG, TAU_LOG, GRFz_LOG] = post_process_GRF(p,X,T);
+% [DDQ_LOG, TAU_LOG, GRFz_LOG] = post_process_GRF(p,X,T);
 
 %% ANIMATION
 animatingRobot(T,X,p);

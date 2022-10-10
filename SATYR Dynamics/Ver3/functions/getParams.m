@@ -7,26 +7,27 @@ p.g = 9.81;
 valM.mW = .42972;
 valM.cm1 = .66162;
 valM.cm2 = .9061;
-valM.mR = 5.639;
+valM.mR = 5.63;
 p.valM = valM;
-
-%Link lengths
-valL.L1 = .180;
-valL.L2 = .100;
-valL.L3 = .118;
-p.valL = valL;
-
-%Linearization angle
-p.use_joints = false;
-p.theta1_num = pi/18;%angle of linearization
-p.theta2_num = findTheta2(p.theta1_num, p.use_joints, valM, valL);
-p.theta3_num = 0;
+p.M = [valM.mW, valM.cm1, valM.cm2, valM.mR];
 
 %CAD values
 p.mK = .04; %currently not used
 p.mH = .4;  %currently not used
-p.R = 0.05; %radius of wheel
+p.R = 0.06; %radius of wheel
 
+%Link lengths
+valL.L1 = .160;
+valL.L2 = .200;
+valL.L3 = .4;
+p.valL = valL;
+p.L = [valL.L1, valL.L2, valL.L3,p.R];
+
+%Linearization angle intialization
+p.use_joints = false;
+p.theta1_num = 0;
+p.theta2_num = 0;
+p.theta3_num = 0;
 
 %Inertial values (from CAD model)
 IW = [[.000423   0     0    ];
@@ -50,8 +51,8 @@ p.IK = ICM1;
 p.IH = ICM2;
 p.IR = IR; 
 
-% Controller params;
-p.Qq = eye(8);
-p.Ru = eye(3);
+%Features
+p.enableSaturation = "cutoff";
+p.captureVideoEnable = false;
 
 end
