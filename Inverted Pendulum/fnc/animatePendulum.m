@@ -18,7 +18,7 @@ f = figure;
 set(f, 'doublebuffer', 'on');
 
 if captureVideoEnable 
-    v = VideoWriter('video_Refined2_03_12', 'MPEG-4');
+    v = VideoWriter('video_04_30_2021', 'MPEG-4');
     %v.FrameRate = fps;
     v.Quality = 100;
     open(v)
@@ -38,7 +38,7 @@ for k = 1:length(timeA)
     hold on
     plot([-5 5],[-R -R],'k','LineWidth',2)
     fill(XW+ .2*R*sin(ang), .2*R*cos(ang),[0 0 1]);
-    axis([-.5 .5 -.05 .2]);
+    axis([-.5 .5 -.05 .5]);
     daspect(ones(1,3));
 
     grid on

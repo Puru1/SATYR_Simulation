@@ -3,15 +3,19 @@ clc;
 clear all;
 addpath fnc
 
-syms xW theta1 real
-syms dxW dtheta1 real
-syms ddxW ddtheta1 tau1 real
+syms xW theta1 lR real
+syms dxW dtheta1 dlR real
+syms ddxW ddtheta1 ddlR tau1 Fp real
 syms g mW mCM IW ICM L1 R real
 
 %States
-q = [xW; theta1];
-dq = [dxW; dtheta1];
-ddq = [ddxW; ddtheta1];
+% q = [xW; theta1];
+% dq = [dxW; dtheta1];
+% ddq = [ddxW; ddtheta1];
+
+q = [xW; theta1; lR];
+dq = [dxW; dtheta1; dlR];
+ddq = [ddxW; ddtheta1; ddlR];
 
 %% HOMOGENEOUS TRANSFORM AND FRAME INIT.
 %Rotation axis
@@ -27,7 +31,7 @@ HTMB0 = [[RB0, vB0]
 
 %Wheel(0) -> CM1 
 R0cm = eye(3);
-v0cm = [0;0;L1]; %  Translation from frame wheel to frame knee (written in frame wheel)
+v0cm = [0;0;hR]; %  Translation from frame wheel to frame knee (written in frame wheel)
 HTM0cm = [[R0cm v0cm] 
          [0 0 0 1]];
 HTMBcm = HTMB0*HTM0cm;
@@ -45,19 +49,19 @@ JvW = jacobian(PosW(1:3),q);
 JvCM = jacobian(PosCM(1:3),q);
 Jv = {JvW JvCM};
 
-% IW = [[.000423   0     0    ];
-%       [   0   .00075   0    ];
-%       [   0      0  .000423 ]];
+IW = [[.000423   0     0    ];
+      [   0   .00075   0    ];
+      [   0      0  .000423 ]];
 
-% ICM = [[.23368    0     0    ];
-%       [   0   .19732   0    ];
-%       [   0      0   .06132 ]];
+ICM = [[.23368    0     0    ];
+      [   0   .19732   0    ];
+      [   0      0   .06132 ]];
 % ICM = [[0    0     0    ];
 %       [   0   0  0    ];
 %       [   0      0   0]];
   
 I = {IW ICM};
-% ICM = 0;
+ICM = 0;
 
 w0 = [0;dxW/R;0];
 wcm = [0;dtheta1;0];
@@ -67,7 +71,7 @@ Jwcm = jacobian(wcm,dq); %CM
 Jw = {Jw0 Jwcm};
 
 %Manipulator inertia matrix.
-M = zeros(2);
+M = zeros(3);
 for i = 1:2
     M = M + (vMass(i)*Jv{i}'*Jv{i} + Jw{i}'*Rot{i}*I{i}*Rot{i}'*Jw{i});
 end
@@ -102,13 +106,11 @@ eqs = simplify(jacobian(dLddqi,q)*dq + jacobian(dLddqi,dq)*ddq - dLdqi);
 
 %Equations of motions H(q)*ddq + C = tau
 H = jacobian(dLddqi,dq);
-C_temp = jacobian(dLddqi,q);
 C = jacobian(dLddqi,q)*dq - dLdqi;
-u = [tau1/R; -tau1];
+u = [tau1/R; -tau1; Fp];
 tau = tau1;
 H_inv = inv(H);
 f = H_inv *(u-C); % The simplify() command and the \ seem to be the problem
-%f_num = simplify(vpa(subs(f,[g mW mCM L1 R],[p.g p.mW p.mCM p.L1 p.R])));
 
 %% LINEARIZATION
 % p = paramaters
@@ -116,20 +118,16 @@ p = getParams();
 L = p.L1;
 M = [p.mW, p.mCM];
 xW = 0;
-            % xW  |  theta1  |  dxW   |  dtheta1   
-% states_lin = [ 0   p.theta1_num   0        0];
-states_lin = [ 0   .14   0        0];
+            % xW  |  theta1     |  hR   |  dxW |  dtheta1 |  dhR    
+states_lin = [ 0   p.theta1_num   .35       0        0        0 ];
 
-
-tau_lin = - vpa(subs(C,[q' dq' g mCM L1],[states_lin p.g p.mCM p.L1]))
+tau_lin = - vpa(subs(C,[q' dq' g mCM],[states_lin p.g p.mCM]))
                                                                                  
 A_var = jacobian(f,[q; dq]);
+A = vpa(subs(A_var,[xW theta1 hR dxW dtheta1 dhR tau1 Fp g mW mCM R],[states_lin tau_lin(2)  p.g p.mW p.mCM p.R]));
 B_var = jacobian(f,tau);
+B = vpa(subs(B_var,[xW theta1 dxW dtheta1 tau1 g mW mCM R],[states_lin tau_lin(2) p.g p.mW p.mCM p.R]));
 
-tic
-A = vpa(subs(A_var,[xW theta1 dxW dtheta1 tau1 g mW mCM L1 R],[states_lin tau_lin(2) p.g p.mW p.mCM p.L1 p.R]));
-B = vpa(subs(B_var,[xW theta1 dxW dtheta1 tau1 g mW mCM L1 R],[states_lin tau_lin(2) p.g p.mW p.mCM p.L1 p.R]));
-toc
 %% FUNCTION(S) GENERATION
 % write_fcn_m('fnc_PosCM.m',{'q','L1'},[],{PosCM,'PosCM'});
 % write_fcn_m('fnc_JvCM.m',{'q','L1'},[],{JvCM,'JvCM'});
@@ -137,8 +135,12 @@ toc
 % write_fcn_m('fnc_C.m',{'q','dq','Mass','L1'},[],{C,'C'});
 % write_fcn_m('fnc_f.m',{'q','dq','Mass','L1'},[],{f,'f'});
 
-write_fcn_m('fnc_A.m',{},[],{A,'A'});
-write_fcn_m('fnc_B.m',{},[],{B,'B'});
+m_list.L = {
+  'L1' 'L(1)';
+    };
+
+write_fcn_m('fnc_A.m',{'L1'},[m_list.L],{A,'A'});
+write_fcn_m('fnc_B.m',{'L1'},[m_list.L],{B,'B'});
 write_fcn_m('fnc_tauLin.m',{},[],{tau_lin,'tau_lin'});
 
 %% OLD METHOD
