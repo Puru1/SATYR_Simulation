@@ -1,4 +1,4 @@
-function SATYRR_Visualize(q,L,f)
+function SATYRR_Visualize(q, L,f)
 % Unit: mm-g-s-rad
 % visualize SATYRR as an x-z planar 3-DoF manipulator
 % vector index seequence: (1) -> ankle. (2) knee. (3) hip.
@@ -57,7 +57,7 @@ plotEndEffector = scatter(f,pjoint(1,end),pjoint(3,end),scatterSize,'b','filled'
 plotCoM = scatter(f,pCoM(1,:),pCoM(3,:),scatterSize,'r','filled');
 plotCoM_R = scatter(f,CoM(1,end),CoM(3,end),scatterSize,'g','filled');
 
-% hold off
+hold off
 axis equal
 xlim(xlimit*[-1,1])
 ylim(ylimit*[-0.1,1.2])

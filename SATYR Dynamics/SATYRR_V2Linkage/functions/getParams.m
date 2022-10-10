@@ -1,15 +1,21 @@
 function p = getParams()
 
+%Spring compression
+p.deltaL = .03;
+
 %Gravity
 p.g = 9.81;
+
+%Spring constant
+p.Ks = 500;
 
 %Link masses
 valM.mW = .42972;
 valM.cm1 = .66162;
 valM.cm2 = .9061;
-valM.mR = 5.63;
+valM.mB = 5.63;
 p.valM = valM;
-p.M = [valM.mW, valM.cm1, valM.cm2, valM.mR];
+p.M = [valM.mW, valM.cm1, valM.cm2, valM.mB];
 
 %CAD values
 p.mK = .04; %currently not used
@@ -17,8 +23,8 @@ p.mH = .4;  %currently not used
 p.R = 0.06; %radius of wheel
 
 %Link lengths
-valL.L1 = .160;
-valL.L2 = .200;
+valL.L1 = .15;
+valL.L2 = .15;
 valL.L3 = .4;
 p.valL = valL;
 p.L = [valL.L1, valL.L2, valL.L3,p.R];
@@ -27,7 +33,7 @@ p.L = [valL.L1, valL.L2, valL.L3,p.R];
 p.use_joints = false;
 p.theta1_num = 0;
 p.theta2_num = 0;
-p.theta3_num = 0;
+p.thetaHip_num = 0;
 
 %Inertial values (from CAD model)
 IW = [[.000423   0     0    ];
