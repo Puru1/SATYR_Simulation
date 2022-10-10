@@ -4,20 +4,23 @@ clearvars -except f q dq ddq;
 close all;
 addpath functions;
 
-global enableSaturation;% Global feature settings
-global K; % Global controller params
-
+p = getParams();
 %% FILE FEATURE SETTINGS
-enableSaturation = "cutoff"; %{cutoff,linear,none}
-captureVideoEnable = true;
+p.enableSaturation = "cutoff"; %{cutoff,linear,none}
+p.captureVideoEnable = false;
 simTime = 4.0;
 
 %% LOCAL VARIBALES
-p = getParams();
-angle_of_linearization = p.theta2_num; %Used in graphing
+p.theta1_num = deg2rad(10);
+[p.theta2_num,p.theta3_num] = solveJointAngles(p.theta1_num,.97,p.M(2:4),p.L,1);
+angle_of_linearization = p.theta2_num; %Used ipn graphing
 
 %% STATE SPACE
-[A,B] = stateSpace('10'); %Send number (char) of angle we want to linearize around i.e 10 degrees = pi/18
+A = fnc_A();
+B = fnc_B();
+A = [[zeros(4,4) eye(4)]; A]; 
+B = [zeros(4,3); B];   
+% [A,B] = stateSpace('10'); %Send number (char) of angle we want to linearize around i.e 10 degrees = pi/18
 
 %% LQR CONTROLLER
 %w = (p.g/p.valL.L1)^0.5;
@@ -25,17 +28,23 @@ angle_of_linearization = p.theta2_num; %Used in graphing
 
 %Witout initial vel
 Qq = diag([1000 1 10 10 1000 1 10 10]); %This worked (not work w 4 m/s ic)
+% Qpos = diag([.1 1 2 2]);
+% Qvel = diag([10 10 10 10]);
+% Qq = blkdiag(Qpos, Qvel);
 Ru = diag([1 10 3]); 
+% Ru = diag([100 2 10]); 
+
 
 %With inital vel
 % Qq = diag([10 1000 1000 1 150 10 10 10]); %This did not. dtheta3 cost < 100
 % Ru = diag([2 10 10]); 
 
-K = lqr(A,B,Qq,Ru);
-K(:,1) = 0;
+K = lqr(A,B,Qq,Ru)
+write_fcn_m('fnc_K.m',{},[],{K,'K'});
+vpa(eig((A-B*K)))
 
 %% SIMULATION
-q0 = [0; pi/8; -pi/10; 0; 0; 0; 0; 0];
+q0 = [0; p.theta1_num; p.theta2_num; p.theta3_num; 0; 0; 0; 0];
 [T,X] = ode45(@(t,X)SimpleSegway(t,X,p),[0 simTime],q0);
 
 % Output States
@@ -50,23 +59,39 @@ dtheta3 = X(:,8);
 
 %% TORQUE CALCULATION
 [tao,tao_desired] = calculateTorques(X,p);
+%%
+testing_X = [0,0,0,0,0,0,0,0];
+testing_tao = zeros(1,3);
+GRFz = calculateGRF(testing_X,p,testing_tao);
+% GRFz = calculateGRF(X,p,tao);
+
 % 
 %% ANIMATION
-animatingRobot(T,X,p);
+%animatingRobot(T,X,p,tao);
+animatingOnlyRobot(T,X,p);
 %animate3DRobot(T,X);
 
 %% ANIMATING SINGLE FRAME
-% singleFrameFigure(p);
-theta = [0,pi/6,0];
+L = [p.valL.L1,p.valL.L2,p.valL.L3];
+M = [p.valM.cm1,p.valM.cm2,p.valM.mR];
 xW = 0;
+% theta1 = deg2rad(0);
+% [theta2,theta3] = solveJointAngles(theta1,1,M,L,1);
+% theta = [theta1,theta2,theta3];
+theta1 = 0;
+theta2 = pi/2;
+theta3 = -pi/4;
+pitch = pi/36;
+% [theta1c,theta2c,theta3c] = motorToControlAngles([theta1,theta2,theta3],pitch);
+% theta = [theta1c,theta2c,theta3c];
+theta = [p.theta1_num,p.theta2_num,p.theta3_num]
 q = [xW, theta];
-L = [1, 1, 1];
-CoM = comCalc(q,L);
-% com = [test, l2Com, l3Com];
-SATYRR_Visualize(theta,L,CoM);
+fSingle = figure(100);
+ax=axes('Parent',fSingle);
+SATYRR_Visualize(q,L,ax);
 
 %% GRAPHING 
-limx = simTime;
+limx = 2;
 
 desiredState = ones(length(T), 4);
 desiredState(:,1) = 0 * desiredState(:,1);
@@ -82,14 +107,16 @@ plot(T,X(:,1:4));
 %plot(T,desiredState);
 title('Positions')
 xlim([0 limx]);
+ylim([-5 5]);
 xlabel('Time (sec)');
 ylabel('Meters or Radians');
 legend('xW', '\theta_{1}', '\theta_{2}', '\theta_{3}');
-
+%%
 subplot(1,2,2)
 plot(T,X(:,5:8));
 title('Velocity')
 xlim([0 limx]);
+ylim([-5 5]);
 xlabel('Time (sec)');
 ylabel('Rads/sec');
 name = legend('$\dot{xW}$', '$\dot{\theta_{1}}$', '$\dot{\theta_{2}}$', '$\dot{\theta_{3}}$');
@@ -114,3 +141,10 @@ xlabel('Time (sec)');
 ylabel('Torque (N*m)');
 legend("tao_{1}", "tao_{2}", "tao_{3}"); 
 
+figure(3)
+plot(T,GRFz);
+title('GRFz')
+xlim([0 limx]);
+xlabel('Time (sec)');
+ylabel('Force (N)');
+% ylim([-10,200]);

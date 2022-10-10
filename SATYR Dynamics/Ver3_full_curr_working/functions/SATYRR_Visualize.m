@@ -1,59 +1,69 @@
-function SATYRR_Visualize(th,L,CoM)
+function SATYRR_Visualize(q,L,f)
 % Unit: mm-g-s-rad
 % visualize SATYRR as an x-z planar 3-DoF manipulator
 % vector index seequence: (1) -> ankle. (2) knee. (3) hip.
-% th -> joint positions
+% q -> joint positions
 % L -> link lengths
 % CoM -> CoM positions relatiev to the corresponding JOINT
-% Assume ankle joint center as inertial frame origin
+
 n = 3; % # of DoFs
-T = zeros(n,4,4);
 pjoint = zeros(3,n); % origin, joint, and end-effector positions in inertial frame
 pCoM = zeros(3,n); % link CoM positions in inertial frame
 pvirtual = zeros(3,2*n);
+
+posCm1 = fnc_PosCM1(q,L);
+posCm2 = fnc_PosCM2(q,L);
+posCmR = fnc_PosCoM_R(q,L);
+
+posW = q(1);
+posK = fnc_PosK(q,L);
+posH = fnc_PosH(q,L);
+posT = fnc_PosT(q,L);
+
+pjoint(:,1) = posK;
+pjoint(:,2) = posH;
+pjoint(:,3) = posT;
+
+pCoM(:,1) = posCm1;
+pCoM(:,2) = posCm2;
+pCoM(:,3) = posCmR;
+
+% CoM Calc
+M = [.66162, .9061, 5.63];
+m1 = M(1);
+m2 = M(2);
+mR = M(3);
+CoMz = (m1*posCm1(3) + m2*posCm2(3) + mR*posCmR(3))/(m1+m2+mR);
+CoMx = (m1*posCm1(1) + m2*posCm2(1) + mR*posCmR(1))/(m1+m2+mR);
+CoM = [CoMx;0;CoMz];
+
 for iDoF = 1:n
-    T(iDoF,:,:) = [Ry(th(iDoF)),[L(iDoF)*sin(th(iDoF)); 0; L(iDoF)*cos(th(iDoF))]; [0,0,0,1]];
-    if iDoF > 1
-        T(iDoF,:,:) = squeeze(T(iDoF - 1,:,:))*squeeze(T(iDoF,:,:));
-    end
-    pjoint(:,iDoF) = getp(squeeze(T(iDoF,:,:)));
-    pCoM(:,iDoF) = getp(squeeze(T(iDoF,:,:))*[eye(3),CoM(:,iDoF);[0,0,0,1]]);
     pvirtual(:,2*iDoF - 1:2*iDoF) = [pCoM(:,iDoF),pjoint(:,iDoF)];
 end
 
 % plot
 lineWidth = 2;
 scatterSize = 50;
+wheelSize = 4*scatterSize;
 xlimit = sum(L);
 ylimit = xlimit;
 
-figure(99)
-pjoint
-pvirtual
-pCom
-plotOrigin = scatter(0,0,scatterSize,'k','filled'); % plot inertial frame origin;
+plotWheel = scatter(posW,0,wheelSize,'k','filled'); % plot inertial frame origin;
 hold on
-plotLink = plot([0,pjoint(1,:)],[0,pjoint(3,:)],'k-','linewidth',lineWidth);
-plotLinkVirtual = plot([0,pvirtual(1,:)],[0,pvirtual(3,:)],'k--','linewidth',lineWidth);
-plotJoint = scatter(pjoint(1,1:end - 1),pjoint(3,1:end - 1),scatterSize,'b','filled');
-plotEndEffector = scatter(pjoint(1,end),pjoint(3,end),scatterSize,'g','filled');
-plotCoM = scatter(pCoM(1,:),pCoM(3,:),scatterSize,'r','filled');
+plotLink = plot(f,[posW,pjoint(1,:)],[0,pjoint(3,:)],'k-','linewidth',lineWidth);
+plotLinkVirtual = plot(f,[posW,pvirtual(1,:)],[0,pvirtual(3,:)],'k--','linewidth',lineWidth);
+plotJoint = scatter(f,pjoint(1,1:end - 1),pjoint(3,1:end - 1),scatterSize,'b','filled');
+plotEndEffector = scatter(f,pjoint(1,end),pjoint(3,end),scatterSize,'b','filled');
+plotCoM = scatter(f,pCoM(1,:),pCoM(3,:),scatterSize,'r','filled');
+plotCoM_R = scatter(f,CoM(1,end),CoM(3,end),scatterSize,'g','filled');
 
-hold off
+% hold off
 axis equal
 xlim(xlimit*[-1,1])
 ylim(ylimit*[-0.1,1.2])
 xlabel('x [mm]')
 ylabel('z [mm]')
-legend([plotLink,plotLinkVirtual,plotJoint,plotEndEffector,plotCoM,plotOrigin],{'Link','Virtual Link','Joint','End-Effector','Link CoM','Inertial Frame Origin'},'location','northeast')
+legend([plotLink,plotLinkVirtual,plotJoint,plotEndEffector,plotCoM,plotWheel,plotCoM_R],{'Link','Virtual Link','Joint','End-Effector','Link CoM','Inertial Frame Origin','CoM of Robot'},'location','northwest')
 grid on
 
-end
-
-function ry = Ry(th)
-ry = [cos(th),0,sin(th); 0,1,0; -sin(th),0,cos(th)];
-end
-
-function p = getp(T)
-p = T(1:3,end);
 end
