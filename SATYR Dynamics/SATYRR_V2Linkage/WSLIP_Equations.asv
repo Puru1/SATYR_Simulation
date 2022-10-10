@@ -120,51 +120,26 @@ f = simplify(H_inv *(u-C)); % The simplify() command and the \ seem to be the pr
 
 % Calculate and show linearization 
 p = getParams();
-<<<<<<< HEAD
-CoM_Standing = fnc_PosCoM_R([0,0,0],[.15,.15,.4,.06]);
-M = [p.valM.mW p.valM.mB];
-xW = 0;
-
-L_total = CoM_Standing(3) - .03; % .3733 -.03
-M_total = sum(M);
-% Linearizing around the normal compression of the spring under gravity
-% p.Ks = (M_total*p.g)/(2*p.deltaL);
-l_h_lin = L_total;
-
-% Linearizing around chosen compression 
-% l_h_lin = L_total - .03;
-
-            %  xW  |  l_h   |  theta1    |   dxW   |   dl_h  |  dtheta1  | 
-states_lin = [  0    l_h_lin       0          0         0        0     ];
-tau_lin = vpa(subs(C,[qVec dqVec g mB Ks L0],[states_lin p.g M_total p.Ks L_total]));
-=======
 L = [p.valL.L1,p.valL.L2,p.valL.L3];
 M = [p.valM.cm1,p.valM.cm2,p.valM.mB];
 xW = 0;
 
 L_total = sum(L);
 M_total = sum(M);
-l_h_lin = L_total - (M_total*9.81)/p.Ks;
+l_h_lin = L_total - (M_total*p.g)/p.Ks; 
 
             %  xW  |  l_h   |  theta1    |   dxW   |   dl_h  |  dtheta1  | 
 states_lin = [  0    l_h_lin       0          0         0        0     ];
 tau_lin = vpa(subs(C,[qVec dqVec g mB Ks L0],[states_lin -p.g M_total p.Ks L_total]));
->>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
 
 %% STATE SPACE
 tau = [tau1;dL];
 tauVec = [tau1 dL];
 A_var = jacobian(f,[q; dq]);
 B_var = jacobian(f,tau);
-<<<<<<< HEAD
-A = vpa(subs(A_var,[qVec dqVec tauVec g mW mB Ks L0 R], [states_lin, tau_lin(3), tau_lin(2),p.g, ...
-                                                    p.valM.mW, p.valM.mB, p.Ks, L_total, p.R]));
-B = vpa(subs(B_var,[qVec dqVec tauVec g mW mB Ks L0 R], [states_lin, tau_lin(3), tau_lin(2),p.g, ...
-=======
 A = vpa(subs(A_var,[qVec dqVec tauVec g mW mB Ks L0 R], [states_lin, tau_lin(3), tau_lin(2),-p.g, ...
                                                     p.valM.mW, p.valM.mB, p.Ks, L_total, p.R]));
 B = vpa(subs(B_var,[qVec dqVec tauVec g mW mB Ks L0 R], [states_lin, tau_lin(3), tau_lin(2),-p.g, ...
->>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
                                                     p.valM.mW, p.valM.mB, p.Ks, L_total, p.R]));
 %%
 m_list = import_m_list();
@@ -172,10 +147,5 @@ write_fcn_m('fnc_A.m',{},[],{A,'A'});
 write_fcn_m('fnc_B.m',{},[],{B,'B'});
 write_fcn_m('fnc_tauLin.m',{},[],{tau_lin,'tau_lin'});
 
-<<<<<<< HEAD
-%write_fcn_m('fnc_H.m',{'q','L','vMass','Ks'},[m_list.q;m_list.L;m_list.M;m_list.p],{H,'H'});
-%write_fcn_m('fnc_C.m',{'q','dq','L','vMass','g','Ks'},[m_list.q;m_list.dq;m_list.L;m_list.M;m_list.p],{C,'C'});
-=======
 write_fcn_m('fnc_H.m',{'q','L','vMass','Ks'},[m_list.q;m_list.L;m_list.M;m_list.p],{H,'H'});
 write_fcn_m('fnc_C.m',{'q','dq','L','vMass','g','Ks'},[m_list.q;m_list.dq;m_list.L;m_list.M;m_list.p],{C,'C'});
->>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207

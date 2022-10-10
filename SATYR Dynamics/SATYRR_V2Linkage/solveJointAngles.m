@@ -17,10 +17,15 @@ function [theta1_out,theta2_out] = solveJointAngles(method,l_h,p);
     L1 = p.valL.L1;
     L2 = p.valL.L2;
     L3 = p.valL.L3;
+<<<<<<< HEAD
     L_com = .0733;  
     alpha = l_h;
     
     % method 1 : The more general trigonometric system of eq
+=======
+    
+    alpha = l_h - L3;
+>>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
     if(method == 1)
         beta = 0;
         z = (L1^2 - L2^2 - (alpha^2 + beta^2))/(-2*L2);
@@ -28,11 +33,17 @@ function [theta1_out,theta2_out] = solveJointAngles(method,l_h,p);
         phi = asin(alpha/A);
         theta2_out = asin(z/A) - phi;
         theta1_out = acos((alpha- L2*cos(theta2_out))/L1);
+<<<<<<< HEAD
         
     % method 2: Assuming knowledge about our system we simplify
     elseif (method == 2)
         theta1_out = acos(l_h/(L1+L2+L_com));
         theta2_out = 0;
+=======
+    elseif (method == 2)
+        theta2_out = 2*acos((alpha/(L1+L2)));
+        theta1_out = -theta2_out/2;
+>>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
     end 
 %     theta2_deg = rad2deg(theta2_out)
 %     theta1_deg = rad2deg(theta1_out)
