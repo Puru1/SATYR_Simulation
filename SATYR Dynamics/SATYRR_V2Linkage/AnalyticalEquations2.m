@@ -13,12 +13,16 @@ syms g mW mCM1 mK mCM2 mH mR IW IK IH IR L1 L2 L3 R H1 real% [gravity, wheel mas
 syms I0x I0y I0z I1x I1y I1z I2x I2y I2z I3x I3y I3z real
 %Joint state vectors and manip. parameters
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
 q = [xW;thetaHip];
 dq = [dxW;dthetaHip];
 ddq = [ddxW;ddthetaHip];
 
 qVec = [xW thetaHip];
 dqVec = [dxW dthetaHip];
+<<<<<<< HEAD
 =======
 q = [xW;theta2];
 dq = [dxW;dtheta2];
@@ -27,6 +31,8 @@ ddq = [ddxW;ddtheta2];
 qVec = [xW theta2];
 dqVec = [dxW dtheta2];
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
 tauVec = [tau1 tau2];
 
 L_CM1 = .2169*L1;
@@ -38,13 +44,19 @@ L_CM = [L_CM1; L_CM2; L_CMRx; L_CMRy];
 L =[L1;L2;L3;R];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
 theta1 = thetaHip;
 theta2 = -2*thetaHip;
 dtheta1 = dthetaHip;
 dtheta2 = 2*dthetaHip;
+<<<<<<< HEAD
 =======
 
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
 %% HOMOGENEOUS TRANSFORMS & FRAME INIT.
 %Rotation axis for each joint
 uy = [0; 1; 0]; %Wheel, knee and hip rotation around y axis
@@ -55,6 +67,7 @@ uy = [0; 1; 0]; %Wheel, knee and hip rotation around y axis
 
 %Base(B) -> Wheel(0)
 <<<<<<< HEAD
+<<<<<<< HEAD
 RB0 = [[cos(theta_imu + theta1) 0 sin(theta_imu + theta1)]; 
        [0 1 0];
        [-sin(theta_imu  + theta1) 0 cos(theta_imu + theta1)]];
@@ -63,6 +76,11 @@ RB0 = [[cos(theta_imu - theta2/2) 0 sin(theta_imu - theta2/2)];
        [0 1 0];
        [-sin(theta_imu  - theta2/2) 0 cos(theta_imu - theta2/2)]];
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+RB0 = [[cos(theta_imu + theta1) 0 sin(theta_imu + theta1)]; 
+       [0 1 0];
+       [-sin(theta_imu  + theta1) 0 cos(theta_imu + theta1)]];
+>>>>>>> adding_folders
 vB0 = [xW;0;0];
 HTMB0 = [[RB0, vB0]
          [0 0 0 1]];
@@ -93,6 +111,7 @@ HTMBcm2 = HTMB1*HTM1cm2;
      
 %Knee(1) -> Hip(2)   
 <<<<<<< HEAD
+<<<<<<< HEAD
 R12 = [[cos(thetaHip) 0 sin(thetaHip)];
        [0 1 0];
        [-sin(thetaHip) 0 cos(thetaHip)];];
@@ -101,6 +120,11 @@ R12 = [[cos(-theta2/2) 0 sin(-theta2/2)];
        [0 1 0];
        [-sin(-theta2/2) 0 cos(-theta2/2)];];
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+R12 = [[cos(thetaHip) 0 sin(thetaHip)];
+       [0 1 0];
+       [-sin(thetaHip) 0 cos(thetaHip)];];
+>>>>>>> adding_folders
 RB2 = RB1*R12;
 v12 = [0; 0; L2];%Translation from frame knee to frame hip (written in frame knee)
 HTM12 = [[R12 v12] 
@@ -139,10 +163,14 @@ Pos = [PosW PosCM1 PosCM2 PosR PosT]; %{VaseWheel, Knee, Hip, Robot}
 
 %Calculate  CoM
 <<<<<<< HEAD
+<<<<<<< HEAD
 pos_com_robot = simplify((mCM1*PosCM1 + mCM2*PosCM2 + mR*PosR)/(mCM1+mCM2+mR));
 =======
 pos_com_robot = (mCM1*PosCM1 + mCM2*PosCM2 + mR*PosR)/(mCM1+mCM2+mR);
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+pos_com_robot = simplify((mCM1*PosCM1 + mCM2*PosCM2 + mR*PosR)/(mCM1+mCM2+mR));
+>>>>>>> adding_folders
 E1 = pos_com_robot(3) - H1 == 0; % E1 is the z constraints for height 
 E2 = pos_com_robot(1) == xW; % E2 is the x constraint to be above the wheel
 
@@ -185,10 +213,14 @@ w0 = [0;dxW/R;0];
 wcm1 = [0;dtheta1;0];
 wcm2 = [0;dtheta2;0]+ wcm1;
 <<<<<<< HEAD
+<<<<<<< HEAD
 wR = [0;dthetaHip;0]+ wcm2;
 =======
 wR = [0;dtheta3;0]+ wcm2;
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+wR = [0;dthetaHip;0]+ wcm2;
+>>>>>>> adding_folders
 Jw0 = jacobian(w0,dq); %Wheel
 Jwcm1 = jacobian(wcm1,dq); %CM1
 Jwcm2 = jacobian(wcm2,dq); %CM2
@@ -212,10 +244,14 @@ dAcmm(1,:) = simplify(jacobian(Acmm(1,:),q) * dq)';
 dAcmm(2,:) = simplify(jacobian(Acmm(2,:),q) * dq)';
 dAcmm(3,:) = simplify(jacobian(Acmm(3,:),q) * dq)';
 <<<<<<< HEAD
+<<<<<<< HEAD
 %%
 =======
 
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+%%
+>>>>>>> adding_folders
 m_list = import_m_list();
 
 write_fcn_m('fnc_PosCM1.m',{'q','L'},[m_list.q_full;m_list.L_full],{PosCM1,'PosCM1'});
@@ -239,12 +275,17 @@ G = jacobian(P,q).';
 
 %Simplifying the expressions for each component of the inertia matrix
 <<<<<<< HEAD
+<<<<<<< HEAD
 for i = 1:2
     for j = 1:2
 =======
 for i = 1:3
     for j = 1:3
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+for i = 1:2
+    for j = 1:2
+>>>>>>> adding_folders
         M(i,j) = simplify(M(i,j));
     end
     G(i,1) = simplify(G(i,1));
@@ -260,16 +301,22 @@ eqs = simplify(jacobian(dLddqi,q)*dq + jacobian(dLddqi,dq)*ddq - dLdqi);
 H = jacobian(dLddqi,dq)
 C = jacobian(dLddqi,q)*dq - dLdqi
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
 u = [tau1/R; -tau1];
 % u = [-tau1/R; tau1; tau2; tau3];
 
 tau = tau1;
+<<<<<<< HEAD
 =======
 u = [tau1/R; -tau1; -tau2];
 % u = [-tau1/R; tau1; tau2; tau3];
 
 tau = [tau1;tau2];
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
 H_inv = inv(H);
 f = H_inv *(u-C); % The simplify() command and the \ seem to be the problem
 %% LINEARIZATION
@@ -281,11 +328,15 @@ M = [p.valM.cm1,p.valM.cm2,p.valM.mB];
 xW = 0;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
 com = fnc_PosCoM_R([0,0,0],[.15,.15,.4,.06]);
 com = com(3);
 theta_imu_lin = 0;
 [theta1_f, theta2_f] = solveJointAngles(2,(com-.03),p);
 q_vis = [xW, theta1_f,theta_imu_lin];
+<<<<<<< HEAD
 =======
 % p.theta1_num = 0;
 % p.theta2_num = 0;
@@ -294,12 +345,17 @@ theta_imu = 0;
 [theta1_f, theta2_f] = solveJointAngles(2,.65,p);
 q_vis = [xW, theta2_f,theta_imu];
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
 fSingle = figure(99);
 ax=axes('Parent',fSingle);
 SATYRR_Visualize(q_vis,L,ax);
 %%
 g_acc = [0;0;-g];
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
 
 states_lin = [0 theta1_f 0 0];
 
@@ -315,6 +371,7 @@ A = vpa(subs(A_var,[qVec dqVec g R mW mCM1 mCM2 mR L1 L2 L3 theta_imu],[states_l
 B_var = jacobian(f,tau);
 B = vpa(subs(B_var,[qVec dqVec tauVec g R mW mCM1 mCM2 mR L1 L2 L3 theta_imu],[states_lin tau_lin(1) tau_lin(2) p.g p.R p.valM.mW p.valM.cm1 p.valM.cm2 p.valM.mB ...
                p.valL.L1 p.valL.L2 p.valL.L3 0]));        
+<<<<<<< HEAD
 =======
 p.theta1_num + p.theta2_num + p.theta3_num
 
@@ -360,6 +417,8 @@ B = vpa(subs(B_var,[qVec dqVec tauVec g R mW mCM1 mCM2 mR L1 L2 L3],[0 p.theta1_
                0 0 0 0 tau_lin(2) tau_lin(3) tau_lin(4) p.g p.R p.valM.mW p.valM.cm1 p.valM.cm2 p.valM.mR ...
                p.valL.L1 p.valL.L2 p.valL.L3]));        
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
 toc
  
 % Copy the following:
@@ -372,6 +431,7 @@ toc
 
 %% FUNCTION(S) GENERATION
 <<<<<<< HEAD
+<<<<<<< HEAD
 % write_fcn_m('fnc_A.m',{},[],{A,'A'});
 % write_fcn_m('fnc_B.m',{},[],{B,'B'});
 % write_fcn_m('fnc_tauLin.m',{},[],{tau_lin,'tau_lin'});
@@ -380,6 +440,11 @@ write_fcn_m('fnc_A.m',{},[],{A,'A'});
 write_fcn_m('fnc_B.m',{},[],{B,'B'});
 write_fcn_m('fnc_tauLin.m',{},[],{tau_lin,'tau_lin'});
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+% write_fcn_m('fnc_A.m',{},[],{A,'A'});
+% write_fcn_m('fnc_B.m',{},[],{B,'B'});
+% write_fcn_m('fnc_tauLin.m',{},[],{tau_lin,'tau_lin'});
+>>>>>>> adding_folders
 
 write_fcn_m('fnc_H.m',{'q','L','vMass'},[m_list.q;m_list.L;m_list.M],{H,'H'});
 write_fcn_m('fnc_C.m',{'q','dq','L','vMass','g'},[m_list.q;m_list.dq;m_list.L;m_list.M;m_list.p],{C,'C'});

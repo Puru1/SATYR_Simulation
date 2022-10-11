@@ -17,6 +17,9 @@ ang_square = (1/16:1/8:1)'*2*pi;
 f = figure(99);
 f.WindowState = 'fullscreen';
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
 % graph_reducedMod = subplot(1,2,1);
 % graph_fullMod = subplot(1,2,2);
 tiledlayout(1,2)
@@ -25,6 +28,7 @@ ax2 = nexttile;
 
 % ax1.XLim = [-.5 .5];
 % ax1.YLim = [0 1];
+<<<<<<< HEAD
 =======
 graph_reducedMod = subplot(1,2,1);
 graph_fullMod = subplot(1,2,2);
@@ -32,6 +36,8 @@ graph_fullMod = subplot(1,2,2);
 graph_reducedMod.XLim = [-.5 .5];
 graph_reducedMod.YLim = [0 1];
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
 
 % ax=axes('Parent',graph_fullMod);
 
@@ -55,6 +61,9 @@ for k = 1:length(timeA)
     ZR = LH*cos(THETA1);
     
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adding_folders
     [theta1_f, theta2_f] = solveJointAngles(2,LH,p);
     q_vis = [XW, theta1_f,THETA1]; % THETA1 = IMU pitch angle 
     SATYRR_Visualize(q_vis,L,ax2);
@@ -70,6 +79,7 @@ for k = 1:length(timeA)
     plot(ax1,[-.5 .5], [-.2*R -.2*R],'k','LineWidth',2)
     fill(ax1, XW+ .2*R*sin(ang), .2*R*cos(ang),[0 0 1]);
     hold(ax1,'off')
+<<<<<<< HEAD
 =======
     [theta1_f, theta2_f] = solveJointAngles(THETA1,LH,p);
     q_vis = [XW, THETA1 + vpa(theta1_f), vpa(-theta1_f+theta2_f),-vpa(theta2_f)];
@@ -85,6 +95,8 @@ for k = 1:length(timeA)
     grid on
     hold off
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+>>>>>>> adding_folders
     
     F = getframe(f);
     drawnow;   

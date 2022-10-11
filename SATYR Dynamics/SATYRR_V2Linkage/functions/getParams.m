@@ -1,20 +1,30 @@
 function p = getParams()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 %Spring compression
 p.deltaL = .03;
 
 =======
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+%Spring compression
+p.deltaL = .03;
+
+>>>>>>> adding_folders
 %Gravity
 p.g = 9.81;
 
 %Spring constant
 <<<<<<< HEAD
+<<<<<<< HEAD
 p.Ks = 500;
 =======
 p.Ks = 1000;
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+p.Ks = 500;
+>>>>>>> adding_folders
 
 %Link masses
 valM.mW = .42972;
@@ -31,12 +41,17 @@ p.R = 0.06; %radius of wheel
 
 %Link lengths
 <<<<<<< HEAD
+<<<<<<< HEAD
 valL.L1 = .15;
 valL.L2 = .15;
 =======
 valL.L1 = .160;
 valL.L2 = .200;
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+valL.L1 = .15;
+valL.L2 = .15;
+>>>>>>> adding_folders
 valL.L3 = .4;
 p.valL = valL;
 p.L = [valL.L1, valL.L2, valL.L3,p.R];
@@ -46,10 +61,14 @@ p.use_joints = false;
 p.theta1_num = 0;
 p.theta2_num = 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
 p.thetaHip_num = 0;
 =======
 p.theta3_num = 0;
 >>>>>>> b6f1ecc8a3fb2eda4e78b6658502c98c386c0207
+=======
+p.thetaHip_num = 0;
+>>>>>>> adding_folders
 
 %Inertial values (from CAD model)
 IW = [[.000423   0     0    ];
